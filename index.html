@@ -1,13 +1,12 @@
-
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Ödeme Formu</title>
+  <title>Ödeme Formu - İzinli Otomatik Doldurma</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f2f5;
+      background: #f9f9f9;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,8 +16,8 @@
     form {
       background: white;
       padding: 25px 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
       width: 320px;
     }
     input, button {
@@ -50,16 +49,16 @@
     name="name"
     placeholder="Ad Soyad"
     autocomplete="name"
-    required
     id="nameInput"
+    required
   />
   <input
     type="text"
     name="cc-number"
     placeholder="Kart Numarası"
     autocomplete="cc-number"
-    required
     id="cardNumberInput"
+    required
   />
   <input
     type="text"
@@ -79,15 +78,27 @@
 </form>
 
 <script>
-  const nameInput = document.getElementById('nameInput');
-  const cardNumberInput = document.getElementById('cardNumberInput');
+  window.onload = () => {
+    // 1. İsim Soyisim otomatik dolduruluyor (örnek olarak sabit bir değer)
+    const nameInput = document.getElementById('nameInput');
+    nameInput.value = "Ahmet Yılmaz";
 
-  nameInput.addEventListener('change', () => {
-    // Ad Soyad alanı dolduğunda kart numarası alanına otomatik odak yap
-    cardNumberInput.focus();
-  });
+    // 2. Kullanıcıdan kart bilgilerini otomatik doldurma izni isteniyor
+    const izin = confirm("Kart bilgilerinizi otomatik doldurmamı ister misiniz?");
+
+    if (izin) {
+      // 3. İzin verilirse kart numarası alanına otomatik odaklanılır
+      const cardNumberInput = document.getElementById('cardNumberInput');
+      cardNumberInput.focus();
+      // Tarayıcı buradan kart bilgilerini otomatik doldurma önerisi çıkarır
+    } else {
+      // 4. İzin verilmezse kullanıcı manuel dolduracak
+      console.log("Kullanıcı kart bilgilerini manuel dolduracak.");
+    }
+  };
 </script>
 
 </body>
 </html>
+
 
