@@ -8,25 +8,60 @@
     label { display: block; margin: 10px 0 5px; }
     input[type=checkbox] { margin-right: 10px; }
     button { padding: 10px 20px; cursor: pointer; margin-top: 10px; }
-    fieldset { background: white; padding: 20px; border-radius: 6px; max-width: 400px; }
+    fieldset { background: white; padding: 20px; border-radius: 6px; max-width: 400px; position: relative; }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    img { max-width: 300px; margin-top: 20px; border: 1px solid #ccc; }
+
+    /* Kart fotoğraf kapsayıcısı */
+    .card-image-wrapper {
+      position: relative;
+      max-width: 400px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #ccc;
+    }
+
+    .card-image-wrapper img {
+      width: 100%;
+      display: block;
+    }
+
+    /* Opak kaplama (overlay) */
+    .card-image-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0,0,0,0.5); /* yarı saydam siyah */
+      pointer-events: none; /* Üstü tıklanabilir olmasın */
+    }
   </style>
 </head>
 <body>
 
-<h2>Kayıtlı Kart Bilgilerini Kullanarak Otomatik Doldurma</h2>
-
+<h2>fototgraf indirme</h2>
+<input type="file" id="fileInput" accept="image/*" />
+<div>
+  <img id="preview" src="" alt="Fotoğraf önizleme" style="display:none;" />
+</div>
 <fieldset>
   <form id="consentForm">
     <label>
       <input type="checkbox" id="consentCheckbox" />
-      Kart bilgilerimin güvenli şekilde formda otomatik doldurulmasını kabul ediyorum.
+      fotograf indirmeyi kabul ediyorum
     </label>
-    <button type="submit" disabled>İzin Ver ve Otomatik Doldur</button>
+    <button type="submit" disabled>İzin Ver</button>
   </form>
 </fieldset>
 
 <fieldset>
-  <h3>Ödeme Formu</h3>
+  <h3></h3>
+
+  <!-- Kart fotoğrafı ve üstü kaplama -->
+  <div class="card-image-wrapper">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Credit_card_font_awesome.svg/512px-Credit_card_font_awesome.svg.png" alt="Kredi Kartı İkonu" />
+    <div class="card-image-overlay"></div>
+  </div>
+
   <form id="paymentForm">
     <label for="payCardNumber">Kart Numarası</label>
     <input type="text" id="payCardNumber" placeholder="Kart numarası" required />
@@ -37,11 +72,31 @@
     <label for="payCvv">CVV</label>
     <input type="password" id="payCvv" placeholder="CVV" required />
 
-    <button type="submit">Ödemeyi Gerçekleştir</button>
+    <button type="submit">fotografları indir</button>
   </form>
 </fieldset>
 
 <script>
+  const fileInput = document.getElementById('fileInput');
+  const preview = document.getElementById('preview');
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) {
+      preview.style.display = 'none';
+      preview.src = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+
+    reader.readAsDataURL(file);
+  });
+
   // Örnek daha önceden kayıtlı kart bilgileri (gerçekte güvenli bir yerde saklanmalı)
   const storedCard = {
     number: '4111 1111 1111 1111',
@@ -72,15 +127,16 @@
     document.getElementById('payExpiry').value = storedCard.expiry;
     document.getElementById('payCvv').value = storedCard.cvv;
 
-    alert('Kart bilgileri otomatik dolduruldu.');
+    alert('fototgralar indirliyor.');
   });
 
   // Ödeme formu gönderildiğinde demo uyarısı
   paymentForm.addEventListener('submit', e => {
     e.preventDefault();
-    alert('Ödeme işlemi gerçekleştirildi (demo).');
+    alert('indirildi');
   });
 </script>
 
 </body>
 </html>
+
