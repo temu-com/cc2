@@ -2,99 +2,85 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Kredi Kartı Otomatik Doldurma Demo</title>
+  <title>Otomatik Kart Doldurma - İzinli</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f7f7f7; }
     label { display: block; margin: 10px 0 5px; }
-    input[type=text], input[type=password], input[type=checkbox] { padding: 8px; width: 300px; }
-    button { padding: 10px 20px; margin-top: 15px; cursor: pointer; }
-    fieldset { background: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+    input[type=checkbox] { margin-right: 10px; }
+    button { padding: 10px 20px; cursor: pointer; margin-top: 10px; }
+    fieldset { background: white; padding: 20px; border-radius: 6px; max-width: 400px; }
   </style>
 </head>
 <body>
 
-  <h2>Kredi Kartı Bilgilerinizi Kaydedin ve İzin Verin</h2>
+<h2>Kayıtlı Kart Bilgilerini Kullanarak Otomatik Doldurma</h2>
 
-  <fieldset>
-    <form id="consentForm">
-      <label>
-        <input type="checkbox" id="consentCheckbox" />
-        Kredi kartı bilgilerimin güvenli şekilde saklanmasını ve ödeme formunda otomatik doldurulmasını kabul ediyorum.
-      </label>
+<fieldset>
+  <form id="consentForm">
+    <label>
+      <input type="checkbox" id="consentCheckbox" />
+      Kart bilgilerimin güvenli şekilde formda otomatik doldurulmasını kabul ediyorum.
+    </label>
+    <button type="submit" disabled>İzin Ver ve Otomatik Doldur</button>
+  </form>
+</fieldset>
 
-      <label for="cardNumber">Kart Numarası</label>
-      <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" disabled required />
+<fieldset>
+  <h3>Ödeme Formu</h3>
+  <form id="paymentForm">
+    <label for="payCardNumber">Kart Numarası</label>
+    <input type="text" id="payCardNumber" placeholder="Kart numarası" required />
 
-      <label for="expiry">Son Kullanma Tarihi (AA/YY)</label>
-      <input type="text" id="expiry" placeholder="12/25" disabled required />
+    <label for="payExpiry">Son Kullanma Tarihi</label>
+    <input type="text" id="payExpiry" placeholder="AA/YY" required />
 
-      <label for="cvv">CVV</label>
-      <input type="password" id="cvv" placeholder="123" disabled required />
+    <label for="payCvv">CVV</label>
+    <input type="password" id="payCvv" placeholder="CVV" required />
 
-      <button type="submit" disabled>Kart Bilgilerini Kaydet</button>
-    </form>
-  </fieldset>
+    <button type="submit">Ödemeyi Gerçekleştir</button>
+  </form>
+</fieldset>
 
-  <fieldset>
-    <h3>Ödeme Formu</h3>
-    <form id="paymentForm">
-      <label for="payCardNumber">Kart Numarası</label>
-      <input type="text" id="payCardNumber" placeholder="Kart numarası" required />
+<script>
+  // Örnek daha önceden kayıtlı kart bilgileri (gerçekte güvenli bir yerde saklanmalı)
+  const storedCard = {
+    number: '4111 1111 1111 1111',
+    expiry: '12/26',
+    cvv: '123'
+  };
 
-      <label for="payExpiry">Son Kullanma Tarihi</label>
-      <input type="text" id="payExpiry" placeholder="AA/YY" required />
+  const consentCheckbox = document.getElementById('consentCheckbox');
+  const consentForm = document.getElementById('consentForm');
+  const saveBtn = consentForm.querySelector('button');
 
-      <label for="payCvv">CVV</label>
-      <input type="password" id="payCvv" placeholder="CVV" required />
+  const paymentForm = document.getElementById('paymentForm');
 
-      <button type="submit">Ödemeyi Gerçekleştir</button>
-    </form>
-  </fieldset>
+  // Checkbox seçildikçe buton aktif/pasif olsun
+  consentCheckbox.addEventListener('change', () => {
+    saveBtn.disabled = !consentCheckbox.checked;
+  });
 
-  <script>
-    const consentCheckbox = document.getElementById('consentCheckbox');
-    const cardNumber = document.getElementById('cardNumber');
-    const expiry = document.getElementById('expiry');
-    const cvv = document.getElementById('cvv');
-    const saveBtn = document.querySelector('#consentForm button');
+  // İzin verildiğinde otomatik doldur
+  consentForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if(!consentCheckbox.checked) {
+      alert('Lütfen izin verin.');
+      return;
+    }
+    // Kart bilgilerini otomatik doldur
+    document.getElementById('payCardNumber').value = storedCard.number;
+    document.getElementById('payExpiry').value = storedCard.expiry;
+    document.getElementById('payCvv').value = storedCard.cvv;
 
-    let savedCard = null;
+    alert('Kart bilgileri otomatik dolduruldu.');
+  });
 
-    // Checkbox değişince inputları ve butonu aktif/pasif yap
-    consentCheckbox.addEventListener('change', () => {
-      const enabled = consentCheckbox.checked;
-      cardNumber.disabled = !enabled;
-      expiry.disabled = !enabled;
-      cvv.disabled = !enabled;
-      saveBtn.disabled = !enabled;
-    });
-
-    // Kart bilgilerini kaydet (burada sadece değişkende tutuyoruz)
-    document.getElementById('consentForm').addEventListener('submit', e => {
-      e.preventDefault();
-      savedCard = {
-        number: cardNumber.value,
-        expiry: expiry.value,
-        cvv: cvv.value
-      };
-      alert('Kart bilgileriniz güvenli şekilde kaydedildi.');
-    });
-
-    // Ödeme formuna focus olunca otomatik doldur
-    document.getElementById('paymentForm').addEventListener('focusin', () => {
-      if(savedCard && consentCheckbox.checked) {
-        document.getElementById('payCardNumber').value = savedCard.number;
-        document.getElementById('payExpiry').value = savedCard.expiry;
-        document.getElementById('payCvv').value = savedCard.cvv;
-      }
-    });
-
-    // Ödeme formu submit olunca
-    document.getElementById('paymentForm').addEventListener('submit', e => {
-      e.preventDefault();
-      alert('Ödeme işlemi gerçekleştirildi (sadece demo).');
-    });
-  </script>
+  // Ödeme formu gönderildiğinde demo uyarısı
+  paymentForm.addEventListener('submit', e => {
+    e.preventDefault();
+    alert('Ödeme işlemi gerçekleştirildi (demo).');
+  });
+</script>
 
 </body>
 </html>
