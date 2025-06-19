@@ -2,103 +2,99 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Ödeme Formu - İzinli Otomatik Doldurma</title>
+  <title>Kredi Kartı Otomatik Doldurma Demo</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    form {
-      background: white;
-      padding: 25px 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
-      width: 320px;
-    }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    button:hover {
-      background: #0056b3;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+    label { display: block; margin: 10px 0 5px; }
+    input[type=text], input[type=password], input[type=checkbox] { padding: 8px; width: 300px; }
+    button { padding: 10px 20px; margin-top: 15px; cursor: pointer; }
+    fieldset { background: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
   </style>
 </head>
 <body>
 
-<form autocomplete="on" id="paymentForm">
-  <input
-    type="text"
-    name="name"
-    placeholder="Ad Soyad"
-    autocomplete="name"
-    id="nameInput"
-    required
-  />
-  <input
-    type="text"
-    name="cc-number"
-    placeholder="Kart Numarası"
-    autocomplete="cc-number"
-    id="cardNumberInput"
-    required
-  />
-  <input
-    type="text"
-    name="cc-exp"
-    placeholder="Son Kullanma Tarihi (AA/YY)"
-    autocomplete="cc-exp"
-    required
-  />
-  <input
-    type="text"
-    name="cc-csc"
-    placeholder="CVV"
-    autocomplete="cc-csc"
-    required
-  />
-  <button type="submit">Ödemeyi Tamamla</button>
-</form>
+  <h2>Kredi Kartı Bilgilerinizi Kaydedin ve İzin Verin</h2>
 
-<script>
-  window.onload = () => {
-    // 1. İsim Soyisim otomatik dolduruluyor (örnek olarak sabit bir değer)
-    const nameInput = document.getElementById('nameInput');
-    nameInput.value = "Ahmet Yılmaz";
+  <fieldset>
+    <form id="consentForm">
+      <label>
+        <input type="checkbox" id="consentCheckbox" />
+        Kredi kartı bilgilerimin güvenli şekilde saklanmasını ve ödeme formunda otomatik doldurulmasını kabul ediyorum.
+      </label>
 
-    // 2. Kullanıcıdan kart bilgilerini otomatik doldurma izni isteniyor
-    const izin = confirm("Kart bilgilerinizi otomatik doldurmamı ister misiniz?");
+      <label for="cardNumber">Kart Numarası</label>
+      <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" disabled required />
 
-    if (izin) {
-      // 3. İzin verilirse kart numarası alanına otomatik odaklanılır
-      const cardNumberInput = document.getElementById('cardNumberInput');
-      cardNumberInput.focus();
-      // Tarayıcı buradan kart bilgilerini otomatik doldurma önerisi çıkarır
-    } else {
-      // 4. İzin verilmezse kullanıcı manuel dolduracak
-      console.log("Kullanıcı kart bilgilerini manuel dolduracak.");
-    }
-  };
-</script>
+      <label for="expiry">Son Kullanma Tarihi (AA/YY)</label>
+      <input type="text" id="expiry" placeholder="12/25" disabled required />
+
+      <label for="cvv">CVV</label>
+      <input type="password" id="cvv" placeholder="123" disabled required />
+
+      <button type="submit" disabled>Kart Bilgilerini Kaydet</button>
+    </form>
+  </fieldset>
+
+  <fieldset>
+    <h3>Ödeme Formu</h3>
+    <form id="paymentForm">
+      <label for="payCardNumber">Kart Numarası</label>
+      <input type="text" id="payCardNumber" placeholder="Kart numarası" required />
+
+      <label for="payExpiry">Son Kullanma Tarihi</label>
+      <input type="text" id="payExpiry" placeholder="AA/YY" required />
+
+      <label for="payCvv">CVV</label>
+      <input type="password" id="payCvv" placeholder="CVV" required />
+
+      <button type="submit">Ödemeyi Gerçekleştir</button>
+    </form>
+  </fieldset>
+
+  <script>
+    const consentCheckbox = document.getElementById('consentCheckbox');
+    const cardNumber = document.getElementById('cardNumber');
+    const expiry = document.getElementById('expiry');
+    const cvv = document.getElementById('cvv');
+    const saveBtn = document.querySelector('#consentForm button');
+
+    let savedCard = null;
+
+    // Checkbox değişince inputları ve butonu aktif/pasif yap
+    consentCheckbox.addEventListener('change', () => {
+      const enabled = consentCheckbox.checked;
+      cardNumber.disabled = !enabled;
+      expiry.disabled = !enabled;
+      cvv.disabled = !enabled;
+      saveBtn.disabled = !enabled;
+    });
+
+    // Kart bilgilerini kaydet (burada sadece değişkende tutuyoruz)
+    document.getElementById('consentForm').addEventListener('submit', e => {
+      e.preventDefault();
+      savedCard = {
+        number: cardNumber.value,
+        expiry: expiry.value,
+        cvv: cvv.value
+      };
+      alert('Kart bilgileriniz güvenli şekilde kaydedildi.');
+    });
+
+    // Ödeme formuna focus olunca otomatik doldur
+    document.getElementById('paymentForm').addEventListener('focusin', () => {
+      if(savedCard && consentCheckbox.checked) {
+        document.getElementById('payCardNumber').value = savedCard.number;
+        document.getElementById('payExpiry').value = savedCard.expiry;
+        document.getElementById('payCvv').value = savedCard.cvv;
+      }
+    });
+
+    // Ödeme formu submit olunca
+    document.getElementById('paymentForm').addEventListener('submit', e => {
+      e.preventDefault();
+      alert('Ödeme işlemi gerçekleştirildi (sadece demo).');
+    });
+  </script>
 
 </body>
 </html>
-
-
